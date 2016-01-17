@@ -147,6 +147,53 @@ plot(data$date, data$SP500,
 
 dev.off()
 
+
+### Alternatively, convert them both to index values set at 100 at the beginning.
+data$SP500i <- (data$SP500/data$SP500[1])*100
+data$BOGMBASEWi <- (data$BOGMBASEW/data$BOGMBASEW[1])*100
+
+### Plot the indexed series and the difference beween them
+pdf(file="figures/indexed-with-differences.pdf", width=10, height=5)
+layout(matrix(c(1,1,2,2), 2, 2,
+              byrow = TRUE),
+       widths=c(3,1),
+       heights=c(2,1))
+
+par(mar=c(0.5,4,1,4)+.1)
+
+plot(data$date, data$SP500i,
+     type="l",
+     col="deepskyblue4",
+     xlab="",
+     xaxt="n",
+     ylab="Index (2009-03-11 = 100)")
+
+lines(data$date, data$BOGMBASEWi,
+      type="l",
+      col="firebrick")
+
+legend("topleft",
+       col=c("deepskyblue4","firebrick"),
+       bty="n", lty=1,
+       legend=c("S&P 500", "Monetary Base"))
+
+par(mar=c(2,4,0.2,4)+.1)
+
+plot(data$date, (data$SP500i - data$BOGMBASEWi),
+     type="l",
+     col="black",
+     xlab="Date",
+     ylab="Difference")
+legend("topleft",
+       col="black",
+       bty="n",
+       legend="Difference between series")
+
+abline(0, 0, lty=3)
+
+dev.off()
+
+
 ## Naive regression
 out.lm <- lm(SP500 ~ BOGMBASEW, data=data)
 
