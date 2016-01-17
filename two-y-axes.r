@@ -101,6 +101,34 @@ two.y(x=data$date,
 dev.off()
 
 
+### Split axis plots can be better, but in this case the units are
+### different units, not just different magnitudes, so it's not a good
+### idea---the issues with compressing the axes of each series arise
+### again. But here's how to do it anyway.
+plot.new()
+layout(matrix(c(1,1,2,2), 2, 2,
+              byrow = TRUE),
+       widths=c(3,1),
+       heights=c(2,1))
+
+par(mar=c(0.5,4,1,4)+.1)
+
+plot(data$date, data$BOGMBASEW/1000,
+     type="l",
+     col="firebrick",
+     xlab="",
+     xaxt="n",
+     ylab="$bn")
+
+par(mar=c(2,4,0.2,4)+.1)
+
+plot(data$date, data$SP500,
+     type="l",
+     col="deepskyblue4",
+     xlab="Date",
+     ylab="Index")
+
+
 ## Naive regression
 out.lm <- lm(SP500 ~ BOGMBASEW, data=data)
 
@@ -117,7 +145,6 @@ dev.off()
 pdf(file="figures/sp500-money-scatter.pdf", height=6, width=6)
 plot(data$BOGMBASEW/1000, data$SP500, xlab="Money Base ($bn)", ylab="S&P 500", main="Why Aintcha Rich?")
 dev.off()
-
 
 
 ## First differences
