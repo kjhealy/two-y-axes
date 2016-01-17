@@ -12,6 +12,12 @@ library(forecast)
 
 theme_set(theme_minimal())
 
+## Make a "figures" subdirectory if one doesn't exist
+ifelse(!dir.exists(file.path("figures")),
+       dir.create(file.path("figures")),
+       FALSE)
+
+
 data <- read.csv("data/fred-data.csv")
 data$date <- ymd(data$date)
 
@@ -19,6 +25,9 @@ data$date <- ymd(data$date)
 data$SP500 <- ts(data$SP500, frequency = 52, start=c(2009, 03, 11))
 data$BOGMBASEW <- ts(data$BOGMBASEW, frequency = 52, start=c(2009, 03, 11))
 
+
+### Quick convenience function, as we're goingn to make this plot four
+### times.
 two.y <- function(x, y1, y2,
                   y1.lim = range(y1),
                   y2.lim = range(y2),
@@ -55,7 +64,9 @@ two.y <- function(x, y1, y2,
     axis(4)
 
     mtext(y2.lab, side=4, line=3)
-    legend("topleft", col=c("deepskyblue4","firebrick"), bty="n", lty=1,
+    legend("topleft",
+           col=c("deepskyblue4","firebrick"),
+           bty="n", lty=1,
            legend=c("S&P 500", "Monetary Base"))
 
 
@@ -88,8 +99,8 @@ two.y(x=data$date,
       ttxt = "Start y1 at zero, max both at max y2")
 
 
-## Same axis
-## Change an axis
+## 4. Put them both on the same axis
+## (kind of a degenerate case)
 two.y(x=data$date,
       y1=data$SP500,
       y2=data$BOGMBASEW,
@@ -101,11 +112,17 @@ two.y(x=data$date,
 dev.off()
 
 
-### Split axis plots can be better, but in this case the units are
+### Split axis plots can be better, but in this case the series are
 ### different units, not just different magnitudes, so it's not a good
 ### idea---the issues with compressing the axes of each series arise
-### again. But here's how to do it anyway.
-plot.new()
+### again. But here's one way to do it anyway.
+
+
+pdf(file="figures/split-plot.pdf", height=5, width=6)
+
+## The layout matrix makes my head hurt.
+## Read the layout() and matrix() docs carefully,
+## or Paul Murrell's excellent book.
 layout(matrix(c(1,1,2,2), 2, 2,
               byrow = TRUE),
        widths=c(3,1),
@@ -128,10 +145,10 @@ plot(data$date, data$SP500,
      xlab="Date",
      ylab="Index")
 
+dev.off()
 
 ## Naive regression
 out.lm <- lm(SP500 ~ BOGMBASEW, data=data)
-
 
 ## Autocorrelation
 pdf(file="figures/SP500-autocorr.pdf", height = 5, width = 8)
